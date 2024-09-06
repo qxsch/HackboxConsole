@@ -106,7 +106,7 @@ $zipPackagePath = Join-Path $scriptPath "hack_console.zip"
 if(Test-Path $zipPackagePath) {
     Remove-Item $zipPackagePath -Force
 }
-Get-ChildItem . | Where-Object { $_.Name -notin @( "iac" ) } | Compress-Archive -DestinationPath $zipPackagePath
+Get-ChildItem $consoleRoot | Where-Object { $_.Name -notin @( "iac" ) } | Compress-Archive -DestinationPath $zipPackagePath
 Write-Host "Publishing the zip package to the web app"
 Publish-AzWebApp -ResourceGroupName $ResourceGroupName -Name $deployment.Outputs.webAppName.Value -ArchivePath $zipPackagePath -Force -ErrorAction Stop | Out-Null
 
