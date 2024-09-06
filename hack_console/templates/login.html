@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}
+Login to HackBox Console
+{% endblock %}
+{% block headloadscript %}
+{% endblock %}
+{% block content %}
+
+{% if message %}
+<div class="loginErrorBox">{{ message }}</div>
+{% endif %}
+<div class="loginBox">
+  <h2>Login</h2>
+  <form action="#" method="post">
+    <div class="formGroup">
+      <label for="username">Username:</label>
+      <input type="text" name="username" />
+    </div>
+    <div class="formGroup">      
+      <label for="password">Password:</label>
+      <input type="password" name="password" />
+    </div>
+    <div class="formGroup">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+{% block bottomloadscript %}
+{% endblock %}

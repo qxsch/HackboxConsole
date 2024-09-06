@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>{% block title %}HackBox Console{% endblock %}</title>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}" />
+		<noscript><link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css') }}" /></noscript>
+		{% block headloadscript %}
+		{% endblock %}
+	</head>
+	<body class="is-preload">
+		<div class="hackConsoleMenuBar">
+			<h1>HackBox Console</h1>
+			<ul>
+				<li><a href="{{ url_for('home') }}">Challenges</a></li>
+				{% if user and user.is_authenticated and user.role == 'coach' %}
+				<li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+				{% endif %}
+				{% if user and user.is_authenticated and user.role in ['hacker', 'coach'] %}
+				<li><a href="{{ url_for('credentials') }}">Credentials</a></li>
+				{% endif %}
+				<li style="float:right">
+					{% if user and user.is_authenticated %}<a class="active" href="{{ url_for('logout') }}">Logout ({{ user.username }})</a>{% else %}<a class="active" href="{{ url_for('login') }}">Login</a>{% endif %}
+				</li>
+			</ul>
+		</div>
+		
+		<div>
+			{% block content %}
+			{% endblock %}
+		</div>
+		{% block bottomloadscript %}
+		{% endblock %}
+	</body>
+</html>

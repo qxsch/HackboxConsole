@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+.vscode
+__pycache__
+env
+/secrets-store/*
+/secrets-store/**/*

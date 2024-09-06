@@ -1,0 +1,179 @@
+@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+@import url('https://fonts.cdnfonts.com/css/segoe-ui-variable-static-display');
+
+/**
+https://coolors.co/palette/264653-2a9d8f-e9c46a-f4a261-e76f51
+*/
+
+* {
+    font-family: 'Segoe UI';
+}
+
+
+div.loginErrorBox {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #440e00;
+    border-radius: 5px;
+    background-color: #E76F51;
+    margin-bottom: 20px;
+    color:#440e00;
+}
+
+
+div.formGroup {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+div.formGroup label {
+    width: 100px;
+    text-align: right;
+}
+
+div.loginBox {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+
+}
+div.loginBox h2 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+
+
+div.hackConsoleMenuBar {
+    margin-bottom: 12px;
+}
+div.hackConsoleMenuBar h1 {
+    text-align: center;
+    
+    color: #000000;
+    font-family: 'Segoe UI Variable Static Small';
+    font-weight: 700;
+    font-size: 1.4em;
+    margin: 0;
+    padding: 0.5em;
+    background-color: #f6f8fa;
+    /*background-image: linear-gradient(90deg, #264653, #2A9D8F, #E9C46A, #F4A261, #E76F51);
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    -moz-text-fill-color: transparent;*/
+}
+div.hackConsoleMenuBar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #264653;
+}
+div.hackConsoleMenuBar li {
+    float: left;
+    border-right:1px solid #bbb;
+}
+div.hackConsoleMenuBar li:last-child {
+    border-right: none;
+}
+div.hackConsoleMenuBar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+div.hackConsoleMenuBar li a:hover {
+    background-color: #4a869e;
+}
+div.hackConsoleMenuBar li a.active {
+    background-color: #2A9D8F;
+}
+div.hackConsoleMenuBar li a.active:hover {
+    background-color: #34c2b1;
+}
+
+div.spacer {
+    margin-bottom: 20px;
+}
+div.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+div.buttons .button {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #2A9D8F;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+div.buttons .button:hover {
+    background-color: #34c2b1;
+}
+
+div.buttons .button.current {
+    background-color: #264653;
+}
+div.buttons .button.current:hover {
+    background-color: #4a869e;
+}
+
+div.buttons .button.danger {
+    background-color: #E76F51;
+}
+
+div.buttons .button.danger:hover {
+    background-color: #c44b2d;
+}
+
+
+div.credentials table {
+    border-collapse: collapse;
+}
+div.credentials table th {
+    background-color: #264653;
+    color: white;
+    padding: 10px;
+}
+div.credentials table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+div.credentials table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+div.credentials table tr:nth-child(odd) {
+    background-color: #f0f0f0;
+}
+
+div.credentials table tr:hover {
+    background-color: #2A9D8F;
+}
+
+div.credentials table tr:hover td {
+    color: #ffffff;
+}
+div.credentials table tr:hover td.credential.hidden::before {
+    color: #ffffff;
+} 
+
+div.credentials table tr td.credential {
+    cursor: pointer;
+}
+
+div.credentials table tr td.credential.hidden::before {
+    color: #E76F51;
+    content: "Hidden";
+    font-style: italic;
+}

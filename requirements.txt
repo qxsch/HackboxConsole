@@ -1,0 +1,11 @@
+Flask
+gunicorn
+werkzeug
+requests
+Pillow
+azure-identity
+azure-data-tables
+azure-storage-blob
+python-dateutil
+flask-login
+natsort

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}
+HackBox Console - Solutions
+{% endblock %}
+{% block headloadscript %}
+    <!-- Import element definition and auto-register -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
+{% endblock %}
+{% block content %}
+<h1 id="challengeTitle">Challenge 1</h1>
+
+<div class="buttons spacer">
+    <a id="navToPreviousSolution" href="#" class="button">Previous</a>
+    <a id="navToCurrentSolution" href="#" class="button current">Current</a>
+    <a id="navToNextSolution" href="#" class="button">Next</a>
+</div>
+
+
+
+<!-- Render Markdown -->
+<zero-md id="zeromd" src=""></zero-md>
+
+{% endblock %}
+
+{% block bottomloadscript %}
+<script type="text/javascript">
+    window.defaultSolutionUrl='{{ url_for("static_solutions", filename="") }}';
+</script>
+<script src="{{ url_for('static', filename='assets/js/solutions.js') }}"></script>
+{% endblock %}
