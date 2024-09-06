@@ -1,5 +1,7 @@
 # HackBox Console
 
+![HackBox Console](./hackbox.jpg)
+
 A portal for **Hackathon participants** to access challenges and credentials.
 
 A portal for **Hackathon coaches** to access challenges, solutions, credentials and unlock challenges for participants.
