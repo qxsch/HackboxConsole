@@ -6,7 +6,9 @@ A portal for **Hackathon participants** to access challenges and credentials.
 
 A portal for **Hackathon coaches** to access challenges, solutions, credentials and unlock challenges for participants.
 
-Solutions and challenges are stored in markdown files in a storage account.
+Solutions and challenges are stored in markdown files.
+  * challanges should follow the format: ``challenge-*.md``, f.e. ``challenge-1.md``, ``challenge-2.md``, ...
+  * solutions should follow the format:  ``solution-*.md``, f.e. ``solution-1.md``, ``solution-2.md``, ...
 
 Thanks to [zero-md](https://github.com/zerodevx/zero-md) the markdown files are rendered as HTML with a broad support for markdown syntax:
 - [x] Math rendering via [`KaTeX`](https://github.com/KaTeX/KaTeX)
