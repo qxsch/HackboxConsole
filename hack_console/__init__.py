@@ -20,10 +20,10 @@ class HackBoxUser(UserMixin):
     password = ""
     role = ""
     def __init__(self, username, password, role):
-        self.username = username
-        self.password = password
-        self.role = role
-        self.id = username
+        self.username = str(username).lower().strip()
+        self.password = str(password)
+        self.role = str(role).lower().strip()
+        self.id = str(username).lower().strip()
 
 def create_all_users():
     allUsers = { }
