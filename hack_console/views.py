@@ -273,6 +273,20 @@ def static_challenges(filename):
         logout_user()
         return redirect(url_for("login"))
     if current_user.role in ["coach", "hacker"]:
+        # additional check for hackers (they can only see the challenges that are available)
+        if current_user.role == "hacker":
+            # file name should be challenge*.md
+            if filename.endswith(".md") and (filename.split("/")[-1]).startswith("challenge"):
+                # is it in the list of challenges?
+                if filename in challenges_mds:
+                    # get the position in the array
+                    idx = challenges_mds.index(filename) + 1
+                    # get the current challenge
+                    hbSettings = HackBoxSettings()
+                    current_challenge = hbSettings.getStep()
+                    # if the challenge is not available, return an error
+                    if idx > current_challenge:
+                        return "# Challenge not yet available", 404, {"Content-Type": "text/markdown"}
         return send_from_directory(challenges_dir, filename)
     return redirect(url_for("login"))
 #endregion -------- STATIC ENDPOINTS --------
