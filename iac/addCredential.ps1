@@ -7,12 +7,15 @@ param(
     [string]$name,
     [Parameter(Mandatory = $true)]
     [string]$value,
-    [string]$group='Default'
+    [string]$group='Default',
+    [string]$ip = ""
 )
 
 # add the client ip to the storage account firewall
 Write-Host "Adding firewall rule for the client ip"
-$ip = (Invoke-RestMethod http://ipinfo.io/json).ip
+if($ip -eq "") {
+    $ip = (Invoke-RestMethod http://ipinfo.io/json).ip
+}
 Add-AzStorageAccountNetworkRule -ResourceGroupName $ResourceGroupName -Name $storageAccountName -IPAddressOrRange "$ip" -ErrorAction Stop | Out-Null
 
 Write-Host "Waiting for 10 seconds for the firewall rule to take effect"
