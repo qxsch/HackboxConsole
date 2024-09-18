@@ -4,6 +4,7 @@ class ChallengeManager {
     #currentChallenge = null;
     #refreshSeconds = 0;
     #refreshTimeout = null;
+    #isSubSite = true;
     constructor() {
         document.getElementById("navToPreviousChallenge").style.display = "none";
         document.getElementById("navToPreviousChallenge").addEventListener("click", this.navToPreviousChallenge.bind(this));
@@ -22,6 +23,13 @@ class ChallengeManager {
         this.refresh();
     }
 
+    gotoSubSiteMd(path) {
+        if(path.startsWith("/md/challenges/") || path.startsWith("/md/solutions/") && path.endsWith(".md")) {
+            this.#isSubSite = true;
+            document.getElementById("zeromd").src = path;
+        }
+    }
+
     #setZeroMdListener() {
         var that = this;
         var currentUrl = new URL(window.location.href);
@@ -36,7 +44,7 @@ class ChallengeManager {
                     node.target = "_blank";
                     return;
                 }
-                if(href.pathname.startsWith("/md/challenges/") || href.pathname.startsWith("/md/solutions/") && href.pathname.endsWith(".md")) {
+                if((href.pathname.startsWith("/md/challenges/") || href.pathname.startsWith("/md/solutions/")) && href.pathname.endsWith(".md")) {
                     node.href="#";
                     node.addEventListener("click", function(event) {
                         event.preventDefault();
@@ -215,7 +223,8 @@ class ChallengeManager {
     }
 
     navToCurrentChallenge() {
-        if(this.#currentChallenge !== this.#currentStep) {
+        if(this.#currentChallenge !== this.#currentStep || this.#isSubSite) {
+            this.#isSubSite = false;
             this.#currentChallenge = this.#currentStep;
             this.#render();
         }

@@ -38,7 +38,7 @@ class SolutionManager {
                     node.target = "_blank";
                     return;
                 }
-                if(href.pathname.startsWith("/md/challenges/") || href.pathname.startsWith("/md/solutions/") && href.pathname.endsWith(".md")) {
+                if((href.pathname.startsWith("/md/challenges/") || href.pathname.startsWith("/md/solutions/")) && href.pathname.endsWith(".md")) {
                     node.href="#";
                     node.addEventListener("click", function(event) {
                         event.preventDefault();
@@ -199,6 +199,7 @@ class SolutionManager {
 
     navToCurrentSolution() {
         if(this.#currentSolution !== this.#currentStep || this.#isSubSite) {
+            this.#isSubSite = false;
             this.#currentSolution = this.#currentStep;
             this.#render();
         }
