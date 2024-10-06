@@ -36,7 +36,7 @@ var webSiteName = toLower('console-${webAppName}')
 
 
 // add a vnet
-resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' = {
   name: 'hackbox-vnet'
   location: location
   properties: {
