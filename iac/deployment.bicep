@@ -109,7 +109,7 @@ resource credentialsTable 'Microsoft.Storage/storageAccounts/tableServices/table
   name: 'credentials'
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
   location: location
   properties: {
@@ -122,7 +122,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   kind: 'linux'
 }
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
+resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: webSiteName
   location: location
   properties: {
