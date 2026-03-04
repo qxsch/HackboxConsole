@@ -28,8 +28,10 @@ param (
     [int]$rdpConcurrentRequests = 20,
     [int]$rdpMinReplicas = 1,
     [int]$rdpMaxReplicas = 10,
+
     # RDP VM Deployment
-    [switch]$deployRdpVms
+    [switch]$deployRdpVms,
+    [bool]$rdpVmByol = $false
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
@@ -175,6 +177,9 @@ if($deployRdpIntegration) {
         }
         throw "RDP Backend Deployment failed"
     }
+    if($rdpDeployment.ProvisioningState -ne "Succeeded") {
+        throw "RDP Backend Deployment failed with provisioning state: " + $rdpDeployment.ProvisioningState
+    }
 
 
     Write-Host "RDP Backend Deployment completed"
@@ -248,7 +253,9 @@ if($null -eq $deployment) {
     }
     throw "Hackbox Console Deployment failed"
 }
-
+if($deployment.ProvisioningState -ne "Succeeded") {
+    throw "Hackbox Console Deployment failed with provisioning state: " + $deployment.ProvisioningState
+}
 
 Write-Host "Hackbox Console Deployment completed"
 Write-Host ( "  - Web App Name:         " + $deployment.Outputs.webAppName.Value )
@@ -314,6 +321,59 @@ if(-not $doNotCleanUp) {
 
 
 
+if($deployRdpVms -and $deployRdpIntegration) {
+    $definedUsers = @()
+    if(Test-Path (Join-Path $consoleRoot "users.json") -PathType Leaf) {
+        $definedUsers = Get-Content (Join-Path $consoleRoot "users.json") | ConvertFrom-Json | Where-Object { ([string]$_.role).ToLower().Trim() -in @( "hacker", "coach" ) }
+    }
+    # query the currently deployed RDP
+    $connections = & (Join-Path $scriptPath "getAllCredentials.ps1") -ResourceGroupName $ResourceGroupName -TableName = "connections"
+
+
+    # do we have any users defined for RDP VM access?
+    if($definedUsers.Count -gt 0) {
+
+        $rdpParams = @{
+            TemplateFile = (Join-Path $scriptPath "bicep" "deployment-multivms.bicep")
+            ResourceGroupName = $rdpResourceGroupName
+            byol = $rdpVmByol
+            virtualNetworkSubnetId = $rdpDeployment.Outputs.vmSubnetId.Value
+            minReplicas = $rdpMinReplicas
+            maxReplicas = $rdpMaxReplicas
+            userVms = $definedUsers
+        }
+        if(-not($null -eq $location -or $location -eq "")) {
+            $rdpParams["location"] = $location
+        }
+        $rdpVmDeployment = New-AzResourceGroupDeployment @rdpParams -Name "rdpvms"  -ErrorAction Continue -ErrorVariable +evx
+        if($null -eq $rdpVmDeployment) {
+            foreach($ev in $evx) {
+                if($ev.Exception.Message.Contains('soft-deleted')) {
+                    Write-Host -ForegroundColor Yellow "Soft deleted resource found:`n$($ev.Exception.Message)"
+                }
+                elseif($ev.Exception.Message.Contains('quota')) {
+                    Write-Host -ForegroundColor Yellow "Quota exceeded:`n$($ev.Exception.Message)"
+                }
+            }
+            throw "RDP Backend Deployment failed"
+        }
+        if($rdpVmDeployment.ProvisioningState -ne "Succeeded") {
+            throw "RDP VM Deployment failed with provisioning state: " + $rdpVmDeployment.ProvisioningState
+        }
+
+
+        Write-Host "RDP Backend Deployment completed"
+        #Write-Host ( "  - xyz:      " + $rdpVmDeployment.Outputs.xyz.Value )
+        #Write-Host ( "  - abc:         " + $rdpVmDeployment.Outputs.abc.Value )    
+        Write-Host "RDP VM Deployment completed. Please use the RDP Backend URL to connect to the RDP VMs from the Hacker Console."
+
+
+
+    }
+    else {
+        Write-Host -ForegroundColor Yellow "No users defined for RDP VM access. Please make sure to provide a users.json file with hacker and coach users for RDP VM access."
+    }
+}
 
 
 Write-Host -ForegroundColor Green ( "URL:  https://" + $deployment.Outputs.webAppUrl.Value )
