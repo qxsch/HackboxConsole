@@ -267,7 +267,7 @@ else {
     $challenge1 = (Get-ChildItem -Path (Join-Path $script:ConsoleRoot "hack_console" "challenges") -Recurse -Filter *challenge*.md | Sort-Object FullName)[0]
     if($challenge1) {
         $relativePath = (Resolve-Path $challenge1.FullName).Path.Replace((Resolve-Path (Join-Path $script:ConsoleRoot "hack_console" "challenges")).Path, "")
-        if($relativePath.StartsWith("\")) {
+        if($relativePath.StartsWith([IO.Path]::DirectorySeparatorChar)) {
             $relativePath = $relativePath.Substring(1)
         }
         $relativeDepth = ($relativePath.Split([IO.Path]::DirectorySeparatorChar).Count - 1)
@@ -291,7 +291,7 @@ else {
     if($solution1) {
         # relative path to solution file
         $relativePath = (Resolve-Path $solution1.FullName).Path.Replace((Resolve-Path (Join-Path $script:ConsoleRoot "hack_console" "solutions")).Path, "")
-        if($relativePath.StartsWith("\")) {
+        if($relativePath.StartsWith([IO.Path]::DirectorySeparatorChar)) {
             $relativePath = $relativePath.Substring(1)
         }
         $relativeDepth = ($relativePath.Split([IO.Path]::DirectorySeparatorChar).Count - 1)
