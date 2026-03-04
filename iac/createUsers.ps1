@@ -48,6 +48,12 @@ Include special characters in complex passwords for additional security.
 .PARAMETER disableTechleadUser
 Disable creation of the techlead user account.
 
+.PARAMETER disableHackerUser
+Disable creation of the hacker user accounts.
+
+.PARAMETER disableCoachUser
+Disable creation of the coach user accounts.
+
 .PARAMETER createCsvFiles
 Generate separate CSV files for hackers and coaches in addition to the main JSON file. (Useful to put passwords f.e. into Excel or PowerPoint for distribution)
 
@@ -77,8 +83,11 @@ param(
     [string[]]$simplePasswordNouns = @(),
     [ValidateRange(12,64)]
     [int]$complexPasswordLength = 16,
+    [switch]$skipCoachUser,
     [switch]$complexPasswordAllowSpecialChars,
     [switch]$disableTechleadUser,
+    [switch]$disableHackerUser,
+    [switch]$disableCoachUser,
     [switch]$createCsvFiles
 
 )
@@ -153,17 +162,21 @@ $tenantDigits = $numberOfTenants.ToString().Length
 # add hacker and coach users for each tenant
 for ($i = 1; $i -le $numberOfTenants; $i++) {
     $paddedIndex = $i.ToString().PadLeft($tenantDigits, '0')
-    $users += [PSCustomObject]@{
-        "username" = ( $baseHackerUsername + $paddedIndex )
-        "password" = ( generatePassword -strength $hackerPasswordStrength -simpleAdjectives $simplePasswordAdjectives -simpleNouns $simplePasswordNouns -complexLength $complexPasswordLength -complexAllowSpecialChars:$complexPasswordAllowSpecialChars )
-        "role" = "hacker"
-        "tenant" = ( "team" + $paddedIndex )
+    if(-not $disableHackerUser) {
+        $users += [PSCustomObject]@{
+            "username" = ( $baseHackerUsername + $paddedIndex )
+            "password" = ( generatePassword -strength $hackerPasswordStrength -simpleAdjectives $simplePasswordAdjectives -simpleNouns $simplePasswordNouns -complexLength $complexPasswordLength -complexAllowSpecialChars:$complexPasswordAllowSpecialChars )
+            "role" = "hacker"
+            "tenant" = ( "team" + $paddedIndex )
+        }
     }
-    $users += [PSCustomObject]@{
-        "username" = ( $baseCoachUsername + $paddedIndex )
-        "password" = ( generatePassword -strength $coachPasswordStrength -simpleAdjectives $simplePasswordAdjectives -simpleNouns $simplePasswordNouns -complexLength $complexPasswordLength -complexAllowSpecialChars:$complexPasswordAllowSpecialChars )
-        "role" = "coach"
-        "tenant" = ( "team" + $paddedIndex )
+    if(-not $disableCoachUser) {
+        $users += [PSCustomObject]@{
+            "username" = ( $baseCoachUsername + $paddedIndex )
+            "password" = ( generatePassword -strength $coachPasswordStrength -simpleAdjectives $simplePasswordAdjectives -simpleNouns $simplePasswordNouns -complexLength $complexPasswordLength -complexAllowSpecialChars:$complexPasswordAllowSpecialChars )
+            "role" = "coach"
+            "tenant" = ( "team" + $paddedIndex )
+        }
     }
 }
 
