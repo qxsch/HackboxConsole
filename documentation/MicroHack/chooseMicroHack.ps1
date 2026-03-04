@@ -2,6 +2,7 @@ param(
     [string]$HackName = "",
     [string]$HackVariant = "",
     [string]$GithubForkUser = "",
+    [string]$Branch = "master",
     [switch]$Download
 )
 
@@ -24,10 +25,10 @@ else {
     }
     if($GithubForkUser -ne "") {
         Write-Host "Downloading from user fork: $GithubForkUser"
-        Invoke-WebRequest -Uri "https://github.com/$GithubForkUser/MicroHack/archive/refs/heads/master.zip" -OutFile "$script:MicroHackRepo.zip"
+        Invoke-WebRequest -Uri "https://github.com/$GithubForkUser/MicroHack/archive/refs/heads/$Branch.zip" -OutFile "$script:MicroHackRepo.zip"
     }
     else {
-        Invoke-WebRequest -Uri "https://github.com/microsoft/MicroHack/archive/refs/heads/master.zip" -OutFile "$script:MicroHackRepo.zip"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/MicroHack/archive/refs/heads/$Branch.zip" -OutFile "$script:MicroHackRepo.zip"
     }
     Expand-Archive "$script:MicroHackRepo.zip" -DestinationPath "$script:MicroHackRepo"
     Remove-Item "$script:MicroHackRepo.zip" -Force | Out-Null
