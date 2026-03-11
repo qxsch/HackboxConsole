@@ -49,7 +49,7 @@ Generic Build Instructions
          $stopDate =  Get-Date -Date $startDate.addDays(2) -Hour 16
          # verify the dates - Remember those are in UTC
          Write-Host "Hackathon Start Date: $startDate (UTC)"
-         Write-Host "Hackathon Stop Date: $stopDate (UTC)"
+         Write-Host "Hackathon Stop Date:  $stopDate (UTC)"
          # create the users in Entra ID
          # if you have a No Mfa group, add f.e. -additionalGroupnames @("NoMfaEnforcement") to the command below
          .\iac\azure\createEntraIdUsers.ps1 -hackathonStartDate $startDate -hackathonEndDate $stopDate
