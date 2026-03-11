@@ -22,7 +22,8 @@ Generic Build Instructions
 
 1. Create the Hackathon Console Users (in this example, we prepare logins for 4 teams with a single coach for each team)
    ```pwsh
-   .\iac\createUsers.ps1 -numberOfTenants 4
+   .\iac\createUsers.ps1 -numberOfTenants 4 -createCsvFiles
+   # there are users-coaches.csv and users-hackers.csv, that you can use to share with the participants and coaches
    ```
 
 1. Build the Hackathon Console and deploy it to Azure
