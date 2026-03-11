@@ -333,7 +333,7 @@ if(-not $doNotCleanUp) {
 
 
 
-
+<#
 if($deployRdpVms -and $deployRdpIntegration) {
     $definedUsers = @()
     if(Test-Path (Join-Path $consoleRoot "users.json") -PathType Leaf) {
@@ -387,6 +387,6 @@ if($deployRdpVms -and $deployRdpIntegration) {
         Write-Host -ForegroundColor Yellow "No users defined for RDP VM access. Please make sure to provide a users.json file with hacker and coach users for RDP VM access."
     }
 }
-
+#>
 
 Write-Host -ForegroundColor Green ( "URL:  https://" + $deployment.Outputs.webAppUrl.Value )
