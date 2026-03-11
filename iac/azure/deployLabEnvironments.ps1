@@ -103,11 +103,25 @@ param(
     [int]$labDeploymentParallelization = 5,
     [ValidateRange(250, 1000000)]
     [int]$maxSleepDelayMilliseconds = 25000,
-    [switch]$skipResourceGroupCreation
+    [switch]$skipResourceGroupCreation,
+    [switch]$autoDiscoveredLab
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $consoleRoot = Split-Path -Parent (Split-Path -Parent $scriptPath)
+
+if($labDirectory -eq "" -and $autoDiscoveredLab) {
+    $labDirectory = (Get-Item "$PSScriptRoot/../lab").FullName 
+    if(-not (Test-Path -Path $labDirectory -PathType Container)) {
+        throw "Auto-discovery of lab directory enabled but directory not found at expected location: $labDirectory"
+    }
+    Write-Host "Auto-discovered lab directory at: $labDirectory"
+}
+elseif($autoDiscoveredLab -and $labDirectory -ne "") {
+    throw "Both auto-discovery and explicit lab directory path provided. Please specify only one method for locating the lab directory."
+}
+
+exit
 
 if(-not(Test-Path (Join-Path $consoleRoot "createdEntraIdUserSettings.json"))) {
     throw "the file createdEntraIdUserSettings.json was not found in $consoleRoot. Please run the createEntraIdUsers.ps1 script first."

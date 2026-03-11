@@ -40,8 +40,21 @@ param(
     [string]$ContactCountry = "USA",
 
     [string]$managementGroupId = "",
-    [string]$subscriptionPrefix = "traininglab-"
+    [string]$subscriptionPrefix = "traininglab-",
+
+    [switch]$autoDiscoveredLab
 )
+
+if($csvFilePath -eq "" -and $autoDiscoveredLab) {
+    $csvFilePath = (Get-Item "$PSScriptRoot/../lab/quota-requests.csv").FullName 
+    if(-not (Test-Path -Path $csvFilePath -PathType Leaf)) {
+        throw "Auto-discovery of quota request CSV enabled but file not found at expected location: $csvFilePath"
+    }
+    Write-Host "Auto-discovered quota request CSV at: $csvFilePath"
+}
+elseif($autoDiscoveredLab -and $csvFilePath -ne "") {
+    throw "Both auto-discovery and explicit CSV path provided. Please specify only one method for locating the quota request CSV."
+}
 
 if(-not (Get-Module -ListAvailable -Name Az)) {
     Install-Module -Name Az -AllowClobber -Force

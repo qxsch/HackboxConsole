@@ -312,6 +312,56 @@ else {
         Set-Content -Path $solution1.FullName -Value $content
     }
 
+    # create the lab directory
+    $labDir = Join-Path $script:ConsoleRoot "iac" "lab"
+    if (Test-Path $labDir -PathType Container) {
+        Remove-Item -Path $labDir -Recurse -Force
+    }
+    # finding the right script for lab deployment (if any)
+    $deployLabScripts = Get-ChildItem -Path $chosenHack.Path -Recurse -Filter "deploy-lab.ps1"
+    $qualifiedLabScript = $null
+    foreach ($candidate in $deployLabScripts) {
+        $cmdInfo = Get-Command $candidate.FullName
+        $params = $cmdInfo.Parameters
+
+        $hasValidParamBlock = (
+            $params.ContainsKey('DeploymentType') -and
+            $params['DeploymentType'].ParameterType -eq [string] -and
+            ($params['DeploymentType'].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] -and
+                $_.ValidValues -contains 'subscription' -and
+                $_.ValidValues -contains 'resourcegroup' -and
+                $_.ValidValues -contains 'resourcegroup-with-subscriptionowner'
+            }) -and
+            $params.ContainsKey('SubscriptionId') -and
+            $params['SubscriptionId'].ParameterType -eq [string] -and
+            $params.ContainsKey('ResourceGroupName') -and
+            $params['ResourceGroupName'].ParameterType -eq [string] -and
+            $params.ContainsKey('PreferredLocation') -and
+            $params['PreferredLocation'].ParameterType -eq [string] -and
+            $params.ContainsKey('AllowedEntraUserIds') -and
+            $params['AllowedEntraUserIds'].ParameterType -eq [string[]]
+        )
+
+        if (-not $hasValidParamBlock) {
+            Write-Host -ForegroundColor Yellow "deploy-lab.ps1 found in $($candidate.Directory.FullName) but does not have the expected param block. Skipping."
+        }
+        else {
+            $qualifiedLabScript = $candidate
+            break
+        }
+    }
+    # found?
+    if ($qualifiedLabScript) {
+        $sourceDir = $qualifiedLabScript.Directory.FullName
+        Write-Host "Found qualifying deploy-lab.ps1 in: $sourceDir"
+        Write-Host "Copying lab contents to: $labDir"
+        New-Item -Path $labDir -ItemType Directory -Force | Out-Null
+        Copy-Item -Path (Join-Path $sourceDir "*") -Destination $labDir -Recurse -Force
+        Write-Host -ForegroundColor Green "This hack supports automated lab deployment. You can deploy the lab environments using the deployLabEnvironments.ps1 script in the iac/azure directory."
+    }
+    else {
+        Write-Host "No deploy-lab.ps1 found in hack directory, this hack does not support automated lab deployment."
+    }
 }
 
 

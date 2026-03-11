@@ -1,6 +1,7 @@
 param (
     [string]$SourceChallengesDir = "",
     [string]$SourceSolutionsDir = "",
+    [string]$SourceLabDir = "",
     [string]$ResourceGroupName = "HackConsole",
 
     [string]$location = $null,
@@ -102,9 +103,18 @@ if(-not $doNotCopyChallengesOrSolutions) {
     # remove the solutions directory
     Remove-Item -Path (Join-Path $consoleRoot "hack_console" "solutions") -Recurse -Force
     # copy the challenges to the console
-    Copy-Item -Path $SourceChallengesDir -Destination (Join-Path $consoleRoot "hack_console" ) -Recurse
+    Copy-Item -Path $SourceChallengesDir -Destination (Join-Path $consoleRoot "hack_console" "challenges") -Recurse
     # copy the solutions to the console
-    Copy-Item -Path $SourceSolutionsDir -Destination (Join-Path $consoleRoot "hack_console" ) -Recurse
+    Copy-Item -Path $SourceSolutionsDir -Destination (Join-Path $consoleRoot "hack_console" "solutions") -Recurse
+
+    # remove the lab directory if it exists and a source lab directory is provided
+    if((Test-Path (Join-Path $consoleRoot "iac" "lab") -PathType Container)) {
+        Remove-Item -Path (Join-Path $consoleRoot "iac" "lab") -Recurse -Force
+    }
+    # copy the lab directory, if a source lab directory is provided
+    if($SourceLabDir -ne "" -and (Test-Path $SourceLabDir -PathType Container)) {
+        Copy-Item -Path $SourceLabDir -Destination (Join-Path $consoleRoot "iac" "lab") -Recurse
+    }
 }
 if(-not (Test-Path (Join-Path $consoleRoot "hack_console" "challenges") -PathType Container)) {
     throw "Challenges directory not found"
@@ -315,6 +325,9 @@ if(-not $doNotCleanUp) {
         Remove-Item -Path (Join-Path $consoleRoot "hack_console" "solutions") -Recurse -Force | Out-Null
         New-Item -Path (Join-Path $consoleRoot "hack_console" "solutions") -ItemType Directory | Out-Null
         New-Item -Path (Join-Path $consoleRoot "hack_console" "solutions" ".gitkeep") -ItemType File | Out-Null
+
+        # clean up the lab directory
+        Remove-Item -Path (Join-Path $consoleRoot "iac" "lab") -Recurse -Force | Out-Null
     }
 }
 

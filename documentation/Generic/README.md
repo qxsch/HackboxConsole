@@ -15,7 +15,6 @@ Generic Build Instructions
    * an optional **lab directory**: It contains:
      - an optional [quota-requests.csv](../../iac/sample-lab/quota-requests.csv) file defining the required Azure resources per subscription
      - an optional [deploy-lab.ps1](../../iac/sample-lab/deploy-lab.ps1) script to deploy the environments per team (subscription or resource group based deployment)
-     - an optional [destroy-lab.ps1](../../iac/sample-lab/destroy-lab.ps1) script to destroy the environments per team
 
 
 ## Execution Steps
@@ -30,10 +29,16 @@ Generic Build Instructions
    ```pwsh
    # select the appropriate subscription for the management resources
    Select-AzSubscription -SubscriptionId "management"
-   # deploy the Hackathon Console
+   # -SourceLabDir is optional, so:
+   # either deploy the Hackathon Console WITH lab provisioning
    .\iac\deployHackerConsole.ps1 `
-    -SourceChallengesDir C:\path\to\directory\challenges\ `
-    -SourceSolutionsDir C:\path\to\directory\solutions\
+      -SourceChallengesDir C:\path\to\directory\challenges\ `
+      -SourceSolutionsDir C:\path\to\directory\solutions\ `
+      -SourceLabDir C:\path\to\directory\lab\
+   # or deploy WITHOUT lab provisioning
+   .\iac\deployHackerConsole.ps1 `
+      -SourceChallengesDir C:\path\to\directory\challenges\ `
+      -SourceSolutionsDir C:\path\to\directory\solutions\
    ```
 
 1. Check the users.json file for the logins of the teams and coaches
@@ -69,16 +74,16 @@ Generic Build Instructions
          
          ```pwsh
          # submitting the quota requests from the csv file
-         .\iac\azure\prepareQuotaRequests.ps1 -labDirectory C:\path\to\directory\lab\quota-requests.csv
+         .\iac\azure\processQuotaRequests.ps1 -autoDiscoveredLab
          ```
 
    1. Multiple Days before the Event
       1. Deploy the lab environments:
          ```pwsh
          # for a resource group based deployment (multiple teams per subscription)
-         .\iac\azure\deployLabEnvironments.ps1 -labDirectory C:\path\to\directory\lab\ -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "resourcegroup" -teamsPerSubscription 4
+         .\iac\azure\deployLabEnvironments.ps1 -autoDiscoveredLab -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "resourcegroup" -teamsPerSubscription 4
          # or for subscription based deployments
-         .\iac\azure\deployLabEnvironments.ps1 -labDirectory C:\path\to\directory\lab\ -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "subscription"
+         .\iac\azure\deployLabEnvironments.ps1 -autoDiscoveredLab -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "subscription"
          ```
       1. Publish the lab user credentials to the Hackathon Console (in case the deploy-lab.ps1 script created entries):
          ```pwsh
