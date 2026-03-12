@@ -23,6 +23,10 @@ Optional management group ID used to further filter subscriptions.
 .PARAMETER subscriptionPrefix
 Subscription name prefix used to scope which enabled subscriptions are processed (defaults to traininglab-).
 
+.PARAMETER noAutoDiscoveredLab
+If set, disables auto-discovery of the quota request CSV file in the expected lab directory location.
+If the csvFilePath parameter is provided, this switch is ignored.
+
 .EXAMPLE
 PS> .\processQuotaRequests.ps1 -csvFilePath .\quotaRequests.csv -subscriptionPrefix "traininglab-"
 #>
@@ -42,18 +46,15 @@ param(
     [string]$managementGroupId = "",
     [string]$subscriptionPrefix = "traininglab-",
 
-    [switch]$autoDiscoveredLab
+    [switch]$noAutoDiscoveredLab
 )
 
-if($csvFilePath -eq "" -and $autoDiscoveredLab) {
+if($csvFilePath -eq "" -and (-not $noAutoDiscoveredLab)) {
     $csvFilePath = (Get-Item "$PSScriptRoot/../lab/quota-requests.csv").FullName 
     if(-not (Test-Path -Path $csvFilePath -PathType Leaf)) {
         throw "Auto-discovery of quota request CSV enabled but file not found at expected location: $csvFilePath"
     }
     Write-Host "Auto-discovered quota request CSV at: $csvFilePath"
-}
-elseif($autoDiscoveredLab -and $csvFilePath -ne "") {
-    throw "Both auto-discovery and explicit CSV path provided. Please specify only one method for locating the quota request CSV."
 }
 
 if(-not (Get-Module -ListAvailable -Name Az)) {

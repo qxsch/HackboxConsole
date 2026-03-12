@@ -54,6 +54,10 @@
     Useful when resource groups already exist or are managed externally.
     Only applicable when deploymentType is 'resourcegroup'.
 
+.PARAMETER noAutoDiscoveredLab
+    If set, disables auto-discovery of the lab directory containing 'deploy-lab.ps1'.
+    If the labDirectory parameter is provided, this switch is ignored.
+
 .EXAMPLE
     .\deployLabEnvironments.ps1
 
@@ -104,24 +108,19 @@ param(
     [ValidateRange(250, 1000000)]
     [int]$maxSleepDelayMilliseconds = 25000,
     [switch]$skipResourceGroupCreation,
-    [switch]$autoDiscoveredLab
+    [switch]$noAutoDiscoveredLab
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $consoleRoot = Split-Path -Parent (Split-Path -Parent $scriptPath)
 
-if($labDirectory -eq "" -and $autoDiscoveredLab) {
+if($labDirectory -eq "" -and (-not $noAutoDiscoveredLab)) {
     $labDirectory = (Get-Item "$PSScriptRoot/../lab").FullName 
     if(-not (Test-Path -Path $labDirectory -PathType Container)) {
         throw "Auto-discovery of lab directory enabled but directory not found at expected location: $labDirectory"
     }
     Write-Host "Auto-discovered lab directory at: $labDirectory"
 }
-elseif($autoDiscoveredLab -and $labDirectory -ne "") {
-    throw "Both auto-discovery and explicit lab directory path provided. Please specify only one method for locating the lab directory."
-}
-
-exit
 
 if(-not(Test-Path (Join-Path $consoleRoot "createdEntraIdUserSettings.json"))) {
     throw "the file createdEntraIdUserSettings.json was not found in $consoleRoot. Please run the createEntraIdUsers.ps1 script first."

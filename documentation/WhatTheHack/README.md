@@ -72,17 +72,17 @@ Run a [WhatTheHack](https://github.com/microsoft/WhatTheHack) hackathon with the
          > Do not forget to edit the csv file, in case you host multiple teams per subscription!!
          
          ```pwsh
-         # submitting the quota requests from the csv file
-         .\iac\azure\processQuotaRequests.ps1 -autoDiscoveredLab
+         # submitting the quota requests from the csv file (optionally use: -csvFilePath .\quotaRequests.csv)
+         .\iac\azure\processQuotaRequests.ps1
          ```
 
    1. Multiple Days before the Event
       1. Deploy the lab environments:
          ```pwsh
          # for a resource group based deployment (multiple teams per subscription)
-         .\iac\azure\deployLabEnvironments.ps1 -autoDiscoveredLab -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "resourcegroup" -teamsPerSubscription 4
+         .\iac\azure\deployLabEnvironments.ps1 -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "resourcegroup" -teamsPerSubscription 4
          # or for subscription based deployments
-         .\iac\azure\deployLabEnvironments.ps1 -autoDiscoveredLab -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "subscription"
+         .\iac\azure\deployLabEnvironments.ps1 -managementGroupId "labsubscriptions" -subscriptionPrefix "traininglab-" -deploymentType "subscription"
          ```
       1. Publish the lab user credentials to the Hackathon Console (in case the deploy-lab.ps1 script created entries):
          ```pwsh
