@@ -50,11 +50,18 @@ param(
 )
 
 if($csvFilePath -eq "" -and (-not $noAutoDiscoveredLab)) {
-    $csvFilePath = (Get-Item "$PSScriptRoot/../lab/quota-requests.csv").FullName 
-    if(-not (Test-Path -Path $csvFilePath -PathType Leaf)) {
-        throw "Auto-discovery of quota request CSV enabled but file not found at expected location: $csvFilePath"
+    try {
+        $csvFilePath = (Get-Item "$PSScriptRoot/../lab/quota-requests.csv").FullName 
+        if((Test-Path -Path $csvFilePath -PathType Leaf)) {
+            Write-Host "Auto-discovered quota request CSV at: $csvFilePath"
+        }
+        else {
+            $csvFilePath = ""
+        }
     }
-    Write-Host "Auto-discovered quota request CSV at: $csvFilePath"
+    catch {
+        $csvFilePath = ""
+    }
 }
 
 if(-not (Get-Module -ListAvailable -Name Az)) {

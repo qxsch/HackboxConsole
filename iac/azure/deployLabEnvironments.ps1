@@ -115,11 +115,18 @@ $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $consoleRoot = Split-Path -Parent (Split-Path -Parent $scriptPath)
 
 if($labDirectory -eq "" -and (-not $noAutoDiscoveredLab)) {
-    $labDirectory = (Get-Item "$PSScriptRoot/../lab").FullName 
-    if(-not (Test-Path -Path $labDirectory -PathType Container)) {
-        throw "Auto-discovery of lab directory enabled but directory not found at expected location: $labDirectory"
+    try {
+        $labDirectory = (Get-Item "$PSScriptRoot/../lab").FullName 
+        if((Test-Path -Path $labDirectory -PathType Container)) {
+            Write-Host "Auto-discovered lab directory at: $labDirectory"
+        }
+        else {
+            $labDirectory = ""
+        }
     }
-    Write-Host "Auto-discovered lab directory at: $labDirectory"
+    catch {
+        $labDirectory = ""
+    }
 }
 
 if(-not(Test-Path (Join-Path $consoleRoot "createdEntraIdUserSettings.json"))) {
