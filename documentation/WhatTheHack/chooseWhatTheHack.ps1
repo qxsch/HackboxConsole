@@ -470,7 +470,8 @@ else {
         Write-Host "Copying lab contents to: $labDir"
         New-Item -Path $labDir -ItemType Directory -Force | Out-Null
         Copy-Item -Path (Join-Path $sourceDir "*") -Destination $labDir -Recurse -Force
-        Write-Host -ForegroundColor Green "This hack supports automated lab deployment. You can deploy the lab environments using ./iac/azure/deployLabEnvironments.ps1 with -autoDiscoveredLab switch."
+        Write-Host -ForegroundColor Green "This hack supports automated lab deployment."
+        Write-Host -ForegroundColor Green "To disable automated lab deployment, use ./iac/azure/deployLabEnvironments.ps1 with -noAutoDiscoveredLab switch."
     }
     else {
         Write-Host "No deploy-lab.ps1 found in hack directory, this hack does not support automated lab deployment."
