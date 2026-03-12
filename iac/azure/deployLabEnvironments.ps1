@@ -116,7 +116,7 @@ $consoleRoot = Split-Path -Parent (Split-Path -Parent $scriptPath)
 
 if($labDirectory -eq "" -and (-not $noAutoDiscoveredLab)) {
     try {
-        $labDirectory = (Get-Item "$PSScriptRoot/../lab").FullName 
+        $labDirectory = (Join-Path (Get-Item "$PSScriptRoot/..").FullName "lab") 
         if((Test-Path -Path $labDirectory -PathType Container)) {
             Write-Host "Auto-discovered lab directory at: $labDirectory"
         }

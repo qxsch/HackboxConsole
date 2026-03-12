@@ -51,7 +51,7 @@ param(
 
 if($csvFilePath -eq "" -and (-not $noAutoDiscoveredLab)) {
     try {
-        $csvFilePath = (Get-Item "$PSScriptRoot/../lab/quota-requests.csv").FullName 
+        $csvFilePath = (Join-Path (Get-Item "$PSScriptRoot/..").FullName "lab" "quota-requests.csv") 
         if((Test-Path -Path $csvFilePath -PathType Leaf)) {
             Write-Host "Auto-discovered quota request CSV at: $csvFilePath"
         }
