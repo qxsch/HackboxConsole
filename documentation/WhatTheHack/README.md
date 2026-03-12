@@ -44,7 +44,7 @@ Run a [WhatTheHack](https://github.com/microsoft/WhatTheHack) hackathon with the
 
 1. Check the users.json file for the logins of the teams and coaches
 
-1. $\color{#D29922}\textsf{\Large\kern{0.2cm}\normalsize(Optional)}$ In case you want to run it within pre-built environments:
+1. To Setup a pre-built environment for the hack:
    1. Weeks before the Event
       1. Create the lab users:
          > [!IMPORTANT]  
