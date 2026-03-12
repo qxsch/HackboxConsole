@@ -84,13 +84,17 @@ if($null -eq $hackathonEndDate) {
 
 # maximum hackathon duration is 5 days
 if(
-    $hackathonEndDate -le $hackathonStartDate -or
-    $hackathonEndDate.AddDays(-5) -gt $hackathonStartDate
+    $hackathonEndDate -le $hackathonStartDate
 ) {
     throw "Hackathon invalid start date and/or end date parameters. Start Date: $($hackathonStartDate.ToString("yyyy-MM-dd HH:mm:ss")), End Date: $($hackathonEndDate.ToString("yyyy-MM-dd HH:mm:ss"))"
 }
+if(
+    $hackathonEndDate.AddDays(-5) -gt $hackathonStartDate
+) {
+    Write-Warning "Hackathon is longer than 5 days. Start Date: $($hackathonStartDate.ToString("yyyy-MM-dd HH:mm:ss")), End Date: $($hackathonEndDate.ToString("yyyy-MM-dd HH:mm:ss"))"
+}
 $lifetimeInMinutes = ($hackathonEndDate - $hackathonStartDate).TotalMinutes
-
+exit
 
 # Connect to Microsoft Graph with required permissions
 $mgctx = Get-MgContext

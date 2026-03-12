@@ -332,7 +332,6 @@ if(-not $doNotCleanUp) {
 }
 
 
-
 <#
 if($deployRdpVms -and $deployRdpIntegration) {
     $definedUsers = @()
@@ -351,8 +350,6 @@ if($deployRdpVms -and $deployRdpIntegration) {
             ResourceGroupName = $rdpResourceGroupName
             byol = $rdpVmByol
             virtualNetworkSubnetId = $rdpDeployment.Outputs.vmSubnetId.Value
-            minReplicas = $rdpMinReplicas
-            maxReplicas = $rdpMaxReplicas
             userVms = $definedUsers
         }
         if(-not($null -eq $location -or $location -eq "")) {
@@ -379,9 +376,6 @@ if($deployRdpVms -and $deployRdpIntegration) {
         #Write-Host ( "  - xyz:      " + $rdpVmDeployment.Outputs.xyz.Value )
         #Write-Host ( "  - abc:         " + $rdpVmDeployment.Outputs.abc.Value )    
         Write-Host "RDP VM Deployment completed. Please use the RDP Backend URL to connect to the RDP VMs from the Hacker Console."
-
-
-
     }
     else {
         Write-Host -ForegroundColor Yellow "No users defined for RDP VM access. Please make sure to provide a users.json file with hacker and coach users for RDP VM access."
