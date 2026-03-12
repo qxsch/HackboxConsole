@@ -234,7 +234,11 @@ class HackBoxCredentialsConsumer {
         return $this.credentials
     }
     [string]jsonifyCredentials() {
-        return ($this.credentials | ConvertTo-Json -Depth 5 -AsArray)
+        $jsonResult = ($this.credentials | ConvertTo-Json -Depth 5 -AsArray)
+        if($null -eq $jsonResult -or $jsonResult -eq "") {
+            $jsonResult = "[]"
+        }
+        return $jsonResult
     }
 }
 

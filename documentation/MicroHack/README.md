@@ -85,8 +85,6 @@ Run a [MicroHack](https://github.com/microsoft/MicroHack) ([Offical Website](htt
          ```
       1. Publish the additional credentials to the Hackathon Console (in case the deploy-lab.ps1 script created entries):
          ```pwsh
-         # check if the createdLabUserSettings.json file exists
-         Test-Path .\createdLabUserSettings.json
          # select the appropriate subscription for the management resources
          Select-AzSubscription -SubscriptionId "management"
          # deploy the Hackathon Console
