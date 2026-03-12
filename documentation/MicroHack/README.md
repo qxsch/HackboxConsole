@@ -4,6 +4,7 @@ Run a [MicroHack](https://github.com/microsoft/MicroHack) ([Offical Website](htt
 
 > [!NOTE]
 > **7+ hacks are supported.** There are some unsupported hacks (~4), that are linked ones or incomplete.
+> Use the chooseMicroHack.ps1 script to find the supported hacks and their details.
 
 
 ## Prerequisites

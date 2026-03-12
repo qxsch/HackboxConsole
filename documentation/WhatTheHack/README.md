@@ -4,6 +4,8 @@ Run a [WhatTheHack](https://github.com/microsoft/WhatTheHack) hackathon with the
 
 > [!NOTE]
 > **59+ hacks are supported.** Some hacks (~12) are not supported. (Unsupported hacks are usually using word or powerpoint files instead of markdown.)
+> Use the chooseMicroHack.ps1 script to find the supported hacks and their details.
+
 
 ## Prerequisites
  - Powershell 7+
