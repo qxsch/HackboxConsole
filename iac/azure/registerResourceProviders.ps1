@@ -71,7 +71,8 @@ param(
         "Microsoft.Advisor",
         "Microsoft.AlertsManagement",
         "Microsoft.Kubernetes",
-        "Microsoft.KubernetesConfiguration"
+        "Microsoft.KubernetesConfiguration",
+        "Microsoft.Insights"
     )
 )
 
