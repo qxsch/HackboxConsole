@@ -94,7 +94,6 @@ if(
     Write-Warning "Hackathon is longer than 5 days. Start Date: $($hackathonStartDate.ToString("yyyy-MM-dd HH:mm:ss")), End Date: $($hackathonEndDate.ToString("yyyy-MM-dd HH:mm:ss"))"
 }
 $lifetimeInMinutes = ($hackathonEndDate - $hackathonStartDate).TotalMinutes
-exit
 
 # Connect to Microsoft Graph with required permissions
 $mgctx = Get-MgContext
