@@ -303,7 +303,7 @@ $zipPackagePath = Join-Path $scriptPath "hack_console.zip"
 if(Test-Path $zipPackagePath) {
     Remove-Item $zipPackagePath -Force
 }
-Get-ChildItem $consoleRoot | Where-Object { $_.Name -notin @( "iac", "createdEntraIdUserSettings.json" ) -and (-not $_.Name.EndsWith('.csv')) } | Compress-Archive -DestinationPath $zipPackagePath
+Get-ChildItem $consoleRoot | Where-Object { $_.Name -notin @( "iac", "createdEntraIdUserSettings.json", "documentation" ) -and (-not $_.Name.EndsWith('.csv')) } | Compress-Archive -DestinationPath $zipPackagePath
 Write-Host "Publishing the zip package to the web app"
 Publish-AzWebApp -ResourceGroupName $ResourceGroupName -Name $deployment.Outputs.webAppName.Value -ArchivePath $zipPackagePath -Force -ErrorAction Stop | Out-Null
 
