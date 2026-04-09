@@ -162,6 +162,7 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
 
             # Remove resource groups
             try {
+                Write-Host "  Removing Resource Groups..." -ForegroundColor Yellow
                 foreach($rg in (Get-AzResourceGroup)) {
                     Write-Output "  Deleting Resource Group: $($rg.ResourceGroupName)"
                     Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force -Confirm:$false -ErrorAction Continue | Out-Null
@@ -171,6 +172,33 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
             }
             catch {
                 $result.Errors += "Resource group deletion error: $_"
+            }
+
+            # Remove policy assignments at subscription level
+            try {
+                Write-Host "  Removing Policy Assignments at subscription scope..." -ForegroundColor Yellow
+                $subscriptionScope = "/subscriptions/$subscriptionId"
+                $policyAssignments = Get-AzPolicyAssignment -Scope $subscriptionScope -ErrorAction SilentlyContinue | Where-Object { $_.Scope -eq $subscriptionScope }
+                foreach ($pa in $policyAssignments) {
+                    Write-Output "  Deleting Policy Assignment: $($pa.Name)"
+                    Remove-AzPolicyAssignment -Id $pa.PolicyAssignmentId -ErrorAction Continue | Out-Null
+                }
+            }
+            catch {
+                $result.Errors += "Policy assignment removal error: $_"
+            }
+
+            # Remove custom policy definitions at subscription level
+            try {
+                Write-Host "  Removing Custom Policy Definitions at subscription scope..." -ForegroundColor Yellow
+                $policyDefinitions = Get-AzPolicyDefinition -Custom -ErrorAction SilentlyContinue | Where-Object { $_.PolicyDefinitionId -like "/subscriptions/$subscriptionId/*" }
+                foreach ($pd in $policyDefinitions) {
+                    Write-Output "  Deleting Policy Definition: $($pd.Name)"
+                    Remove-AzPolicyDefinition -Id $pd.PolicyDefinitionId -Force -ErrorAction Continue | Out-Null
+                }
+            }
+            catch {
+                $result.Errors += "Policy definition removal error: $_"
             }
 
             return $result
