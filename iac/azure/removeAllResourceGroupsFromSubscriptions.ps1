@@ -92,6 +92,8 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
                 SubscriptionId = $subscriptionId
                 LocksRemoved = 0
                 ResourceGroupsDeleted = 0
+                DeploymentsDeleted = 0
+                PoliciesRemoved = 0
                 Errors = @()
             }
 
@@ -99,13 +101,13 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
             # Remove locks first
             try {
                 foreach($lock in (Get-AzResourceLock -ErrorAction SilentlyContinue | Sort-Object ResourceId)) {
-                    Write-Output "  Removing lock from Resource: $($lock.ResourceId)"
+                    Write-Host "  Removing lock from Resource: $($lock.ResourceId)"
                     $lock | Remove-AzResourceLock -ErrorAction Continue -Force -Confirm:$false | Out-Null
                     $result.LocksRemoved++
                     Start-Sleep -Seconds 1
                 }
                 if($result.LocksRemoved -gt 0) {
-                    Write-Output "  Waiting 10 seconds for locks to be fully removed..."
+                    Write-Host "  Waiting 10 seconds for locks to be fully removed..."
                     Start-Sleep -Seconds 10
                 }
             }
@@ -164,7 +166,7 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
             try {
                 Write-Host "  Removing Resource Groups..." -ForegroundColor Yellow
                 foreach($rg in (Get-AzResourceGroup)) {
-                    Write-Output "  Deleting Resource Group: $($rg.ResourceGroupName)"
+                    Write-Host "  Deleting Resource Group: $($rg.ResourceGroupName)"
                     Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force -Confirm:$false -ErrorAction Continue | Out-Null
                     $result.ResourceGroupsDeleted++
                     Start-Sleep -Milliseconds 500
@@ -180,25 +182,54 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
                 $subscriptionScope = "/subscriptions/$subscriptionId"
                 $policyAssignments = Get-AzPolicyAssignment -Scope $subscriptionScope -ErrorAction SilentlyContinue | Where-Object { $_.Scope -eq $subscriptionScope }
                 foreach ($pa in $policyAssignments) {
-                    Write-Output "  Deleting Policy Assignment: $($pa.Name)"
-                    Remove-AzPolicyAssignment -Id $pa.PolicyAssignmentId -ErrorAction Continue | Out-Null
+                    Write-Host "  Deleting Policy Assignment: $($pa.Name)"
+                    Remove-AzPolicyAssignment -Id $pa.Id -ErrorAction Continue | Out-Null
                 }
             }
             catch {
                 $result.Errors += "Policy assignment removal error: $_"
             }
 
+            # Remove custom policy set definitions (initiatives) at subscription level
+            try {
+                Write-Host "  Removing Custom Policy Set Definitions at subscription scope..." -ForegroundColor Yellow
+                $policySetDefinitions = Get-AzPolicySetDefinition -Custom -ErrorAction SilentlyContinue | Where-Object { $_.Id -like "/subscriptions/$subscriptionId/*" }
+                foreach ($psd in $policySetDefinitions) {
+                    Write-Host "  Deleting Policy Set Definition: $($psd.Name)"
+                    Remove-AzPolicySetDefinition -Id $psd.Id -Force -ErrorAction Continue | Out-Null
+                    $result.PoliciesRemoved++
+                }
+            }
+            catch {
+                $result.Errors += "Policy set definition removal error: $_"
+            }
+
             # Remove custom policy definitions at subscription level
             try {
                 Write-Host "  Removing Custom Policy Definitions at subscription scope..." -ForegroundColor Yellow
-                $policyDefinitions = Get-AzPolicyDefinition -Custom -ErrorAction SilentlyContinue | Where-Object { $_.PolicyDefinitionId -like "/subscriptions/$subscriptionId/*" }
+                $policyDefinitions = Get-AzPolicyDefinition -Custom -ErrorAction SilentlyContinue | Where-Object { $_.Id -like "/subscriptions/$subscriptionId/*" }
                 foreach ($pd in $policyDefinitions) {
-                    Write-Output "  Deleting Policy Definition: $($pd.Name)"
-                    Remove-AzPolicyDefinition -Id $pd.PolicyDefinitionId -Force -ErrorAction Continue | Out-Null
+                    Write-Host "  Deleting Policy Definition: $($pd.Name)"
+                    Remove-AzPolicyDefinition -Id $pd.Id -Force -ErrorAction Continue | Out-Null
+                    $result.PoliciesRemoved++
                 }
             }
             catch {
                 $result.Errors += "Policy definition removal error: $_"
+            }
+
+            # Remove subscription-level deployments
+            try {
+                Write-Host "  Removing subscription-level deployments..." -ForegroundColor Yellow
+                $deployments = Get-AzSubscriptionDeployment -ErrorAction SilentlyContinue
+                foreach ($deployment in $deployments) {
+                    Write-Host "  Deleting deployment: $($deployment.DeploymentName)"
+                    Remove-AzSubscriptionDeployment -Name $deployment.DeploymentName -ErrorAction Continue | Out-Null
+                    $result.DeploymentsDeleted++
+                }
+            }
+            catch {
+                $result.Errors += "Subscription deployment removal error: $_"
             }
 
             return $result
@@ -220,7 +251,7 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
             else {
                 $jobResult = Receive-Job -Job $item.Job
                 if($jobResult -is [hashtable] -or $jobResult -is [PSCustomObject]) {
-                    Write-Host "[Job $($item.Index + 1)] Cleanup completed for subscription $($item.Subscription.Name) - Locks removed: $($jobResult.LocksRemoved), Resource groups deleted: $($jobResult.ResourceGroupsDeleted) ($completedCount/$($qualifiedSubscriptions.Count))" -ForegroundColor Green
+                    Write-Host "[Job $($item.Index + 1)] Cleanup completed for subscription $($item.Subscription.Name) - Locks removed: $($jobResult.LocksRemoved), Resource groups deleted: $($jobResult.ResourceGroupsDeleted), Deployments deleted: $($jobResult.DeploymentsDeleted), Policies removed: $($jobResult.PoliciesRemoved) ($completedCount/$($qualifiedSubscriptions.Count))" -ForegroundColor Green
                     if($jobResult.Errors.Count -gt 0) {
                         foreach($err in $jobResult.Errors) {
                             Write-Warning "  Error: $err"
