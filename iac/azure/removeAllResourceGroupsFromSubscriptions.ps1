@@ -66,6 +66,41 @@ foreach($sub in (Get-AzSubscription  | Where-Object { $_.Name.ToLower().StartsWi
 Write-Host "Found $($qualifiedSubscriptions.Count) qualified subscriptions to clean up."
 Write-Host "Starting parallel cleanup with max $parallelization concurrent jobs..."
 
+function Merge-JobResult {
+    param([object[]]$JobOutput)
+    $merged = @{
+        SubscriptionName = ''
+        SubscriptionId   = ''
+        LocksRemoved         = 0
+        ResourceGroupsDeleted = 0
+        DeploymentsDeleted   = 0
+        PoliciesRemoved      = 0
+        Errors               = @()
+    }
+    $found = $false
+    foreach($item in $JobOutput) {
+        if($item -is [hashtable] -or $item -is [PSCustomObject]) {
+            if(
+                (-not $item.SubscriptionId) -and (-not $item.SubscriptionName) -and
+                (-not $item.LocksRemoved) -and (-not $item.ResourceGroupsDeleted) -and 
+                (-not $item.DeploymentsDeleted) -and (-not $item.PoliciesRemoved)
+            ) {
+                continue
+            }
+            $found = $true
+            $merged.SubscriptionName       = $item.SubscriptionName
+            $merged.SubscriptionId         = $item.SubscriptionId
+            $merged.LocksRemoved          += [int]$item.LocksRemoved
+            $merged.ResourceGroupsDeleted += [int]$item.ResourceGroupsDeleted
+            $merged.DeploymentsDeleted    += [int]$item.DeploymentsDeleted
+            $merged.PoliciesRemoved       += [int]$item.PoliciesRemoved
+            if($item.Errors) { foreach($e in $item.Errors) { $merged.Errors += $e } }
+        }
+    }
+    if(-not $found) { return $null }
+    return $merged
+}
+
 # Run subscription cleanups in parallel using jobs
 $runningJobs = @()
 $taskIndex = 0
@@ -246,11 +281,21 @@ while($taskIndex -lt $qualifiedSubscriptions.Count -or $runningJobs.Count -gt 0)
         foreach($item in $completed) {
             $completedCount++
             if($item.Job.State -eq 'Failed') {
+                $jobOutput = @(Receive-Job -Job $item.Job -ErrorAction SilentlyContinue)
+                $jobResult = Merge-JobResult -JobOutput $jobOutput
+                if($null -ne $jobResult) {
+                    if($jobResult.Errors.Count -gt 0) {
+                        foreach($err in $jobResult.Errors) {
+                            Write-Warning "  Error: $err"
+                        }
+                    }
+                }
                 Write-Warning "[Job $($item.Index + 1)] Cleanup FAILED for subscription $($item.Subscription.Name): $($item.Job.ChildJobs[0].JobStateInfo.Reason)"
             }
             else {
-                $jobResult = Receive-Job -Job $item.Job
-                if($jobResult -is [hashtable] -or $jobResult -is [PSCustomObject]) {
+                $jobOutput = @(Receive-Job -Job $item.Job)
+                $jobResult = Merge-JobResult -JobOutput $jobOutput
+                if($null -ne $jobResult) {
                     Write-Host "[Job $($item.Index + 1)] Cleanup completed for subscription $($item.Subscription.Name) - Locks removed: $($jobResult.LocksRemoved), Resource groups deleted: $($jobResult.ResourceGroupsDeleted), Deployments deleted: $($jobResult.DeploymentsDeleted), Policies removed: $($jobResult.PoliciesRemoved) ($completedCount/$($qualifiedSubscriptions.Count))" -ForegroundColor Green
                     if($jobResult.Errors.Count -gt 0) {
                         foreach($err in $jobResult.Errors) {
