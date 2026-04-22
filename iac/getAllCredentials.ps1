@@ -249,7 +249,49 @@ try {
             $body = $response.Content | ConvertFrom-Json
             if ($body.value) {
                 foreach ($entity in $body.value) {
-                    $allEntities.Add($entity)
+                    if($TableName -eq 'credentials') {
+                        if($null -ne $entity.note) {
+                            $allEntities.Add([pscustomobject]@{
+                                tenant = $entity.PartitionKey
+                                group = $entity.group
+                                name = $entity.name
+                                value = $entity.Credential
+                                note = $entity.note
+                            })
+                        }
+                        else {
+                            $allEntities.Add([pscustomobject]@{
+                                tenant = $entity.PartitionKey
+                                group = $entity.group
+                                name = $entity.name
+                                value = $entity.Credential
+                            })
+                        }
+                    }
+                    elseif($TableName -eq 'connections') {
+                        if($null -eq $entity.port) {
+                            $allEntities.Add([pscustomobject]@{
+                                hackboxuser = $entity.PartitionKey
+                                hackboxconnection = $entity.RowKey
+                                user = $entity.user
+                                pass = $entity.pass
+                                host = $entity.host
+                            })
+                        }
+                        else {
+                            $allEntities.Add([pscustomobject]@{
+                                hackboxuser = $entity.PartitionKey
+                                hackboxconnection = $entity.RowKey
+                                user = $entity.user
+                                pass = $entity.pass
+                                host = $entity.host
+                                port = $entity.port
+                            })
+                        }
+                    }
+                    else {
+                        $allEntities.Add($entity)
+                    }
                 }
             }
 

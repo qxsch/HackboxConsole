@@ -41,6 +41,15 @@ Generic Build Instructions
       -SourceSolutionsDir C:\path\to\directory\solutions\
    ```
 
+1. Ensure that you have the Storage Table Data Contributor:
+   ```pwsh
+   # select the appropriate subscription for the management resources
+   Select-AzSubscription -SubscriptionId "management"
+   # you can add yourself as a "Storage Table Data Contributor" on subscription or resource group level
+   # (Conflict Error means you already have the permissions assigned)
+   New-AzRoleAssignment -SignInName (Get-AzContext).Account.Id -RoleDefinitionName "Storage Table Data Contributor" -Scope "/subscriptions/$((Get-AzContext).Subscription.Id)"
+   ```
+
 1. Check the users.json file for the logins of the teams and coaches
 
 1. To Setup a pre-built environment for the hack:
