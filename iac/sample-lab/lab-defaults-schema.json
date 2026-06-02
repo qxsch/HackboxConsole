@@ -23,6 +23,11 @@
     "preferredLocation": {
       "type": "string",
       "description": "Comma-separated list of preferred Azure regions, in priority order (e.g. \"swedencentral, westeurope\")."
+    },
+    "estimatedDailyCostsUsd": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Estimated daily cost per lab environment in USD. Used for cost forecasting in the lab lifecycle wizard."
     }
   },
   "additionalProperties": false
